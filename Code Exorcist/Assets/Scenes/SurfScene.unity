@@ -200,6 +200,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   oceanSurface: {fileID: 338406930}
   flatSurfaceValue: 0.05
+  bullet: {fileID: 44633487298377127, guid: 24c30db9ad435eb499038d4e6aad3f33, type: 3}
+  bulletList: []
+  numBullets: 1
   ocean: {fileID: 338406926}
 --- !u!4 &244460751
 Transform:
@@ -232,7 +235,7 @@ GameObject:
   - component: {fileID: 338406929}
   m_Layer: 0
   m_Name: OceanSurface
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295

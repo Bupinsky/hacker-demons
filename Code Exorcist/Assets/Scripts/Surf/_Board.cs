@@ -25,6 +25,11 @@ public class _Board : MonoBehaviour
 
     public float flatSurfaceValue;
 
+    public GameObject bullet;
+
+    public GameObject[] bulletList;
+
+    public int numBullets = 1;
 
     public GameObject ocean;
 
@@ -33,6 +38,8 @@ public class _Board : MonoBehaviour
     float score = 0;
 
     bool dead = false;
+
+    float cooldown = 0;
 
     public void Start()
     {
@@ -52,6 +59,8 @@ public class _Board : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, normal).normalized, normal);
 
         transform.Translate(0, .5f, 0, Space.Self);
+
+        bulletList = new GameObject[numBullets];
        
     }
 
@@ -121,11 +130,42 @@ public class _Board : MonoBehaviour
             }
 
         }
+        if (cooldown > 0)
+        {
+            cooldown -= Time.deltaTime;
+        } else
+        {
+            cooldown = 0;
+            if (Input.GetKey(KeyCode.UpArrow) && cooldown <= 0)
+            {
+                Shoot("UP");
+                cooldown = 0.4f;
+            }
+            if (Input.GetKey(KeyCode.DownArrow) && cooldown <= 0)
+            {
+                Shoot("DOWN");
+                cooldown = 0.4f;
+            }
+            if (Input.GetKey(KeyCode.LeftArrow) && cooldown <= 0)
+            {
+                Shoot("LEFT");
+                cooldown = 0.4f;
+            }
+            if (Input.GetKey(KeyCode.RightArrow) && cooldown <= 0)
+            {
+                Shoot("RIGHT");
+                cooldown = 0.4f;
+            }
+        }
 
         x = x + Time.deltaTime * (vel.x+vel.normalized.x);
-        z = z + Time.deltaTime * (vel.z+vel.normalized.z) - ocean.GetComponent<WaveGeneration>().deltaZ*50; //subtract an ammount proportional to the movement of the waves
+        z = z + Time.deltaTime * (vel.z+vel.normalized.z); //subtract an ammount proportional to the movement of the waves
+        if (normal.x > flatSurfaceValue || normal.z > flatSurfaceValue)
+        {
+            z -= ocean.GetComponent<WaveGeneration>().deltaZ * 50;
+        }
 
-        y = oceanSurface.SampleHeight(new Vector3(x, 0, z)) + oceanSurface.GetPosition().y;
+            y = oceanSurface.SampleHeight(new Vector3(x, 0, z)) + oceanSurface.GetPosition().y;
 
         transform.position = new Vector3(x, y, z);
 
@@ -172,6 +212,35 @@ public class _Board : MonoBehaviour
         //vel = (speed+(normal.x*normal.x+normal.z*normal.z)*2) * transform.forward;
         vel = speed * transform.forward;
     }
+
+    void Shoot(string shotDirection)
+    {
+        if (shotDirection == "UP")
+        {
+            bulletList[0] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
+            bulletList[0].transform.localScale = new Vector3(5, 5, 5);
+            bulletList[0].GetComponent<BulletScript>().SetVelocity(0, 0, 100);
+        }
+        if (shotDirection == "DOWN")
+        {
+            bulletList[0] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
+            bulletList[0].transform.localScale = new Vector3(5, 5, 5);
+            bulletList[0].GetComponent<BulletScript>().SetVelocity(0, 0, -100);
+        }
+        if (shotDirection == "LEFT")
+        {
+            bulletList[0] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
+            bulletList[0].transform.localScale = new Vector3(5, 5, 5);
+            bulletList[0].GetComponent<BulletScript>().SetVelocity(-100, 0, 0);
+        }
+        if (shotDirection == "RIGHT")
+        {
+            bulletList[0] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
+            bulletList[0].transform.localScale = new Vector3(5, 5, 5);
+            bulletList[0].GetComponent<BulletScript>().SetVelocity(100, 0, 0);
+        }
+    }
+
     void OnGUI()
     {
 

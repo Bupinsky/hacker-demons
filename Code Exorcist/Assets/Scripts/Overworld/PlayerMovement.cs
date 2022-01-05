@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce;
     bool isGrounded = false ;
     public float gravityScale = 1;
+    public GameObject model;
 
     private Vector3 moveDirection;
 
@@ -22,7 +23,9 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        GroundCheck();
+        if (DialogueSystem.isActive == true)
+            return;
+/*        GroundCheck();*/
 
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
@@ -35,6 +38,7 @@ public class PlayerMovement : MonoBehaviour
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             moveDirection.x = moveDir.x * speed;
             moveDirection.z = moveDir.z * speed;
+            model.transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
         } else
         {
             moveDirection.x = 0f;
@@ -42,21 +46,24 @@ public class PlayerMovement : MonoBehaviour
         }
 
 
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            moveDirection.y = jumpForce;
-        }
+        /*        if (Input.GetButtonDown("Jump") && isGrounded)
+                {
+                    moveDirection.y = jumpForce;
 
-        if (!isGrounded)
-        {
-            moveDirection.y = moveDirection.y + (Physics.gravity.y * gravityScale);
-        }
+                }*/
+
+        /*        if (!isGrounded)
+                {
+                    moveDirection.y = moveDirection.y + (Physics.gravity.y * gravityScale);
+                }*/
+
+        moveDirection.y = Physics.gravity.y *20;
 
         controller.Move(moveDirection * Time.deltaTime);
 
 
     }
-    void GroundCheck()
+/*    void GroundCheck()
     {
         RaycastHit hit;
         float distance = 2f;
@@ -70,5 +77,5 @@ public class PlayerMovement : MonoBehaviour
         {
             isGrounded = false;
         }
-    }
+    }*/
 }
