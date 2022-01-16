@@ -38,7 +38,6 @@ public class TwistRockRoll : MonoBehaviour
        
         if (Input.GetKeyDown(KeyCode.W)) //SpeedUp
         {
-            //Exercise 14 requires that you complete the code that will make RozXy lean in the direction of the tangential acceleration
             switch (pose)
             {
                 case Pose.NORTH:
@@ -59,7 +58,6 @@ public class TwistRockRoll : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.S))  //SlowDown
         {
-            //Exercise 14 requires that you complete the code that will make RozXy lean in the direction of the tangential acceleration (decceleration)
             switch (pose)
             {
                 case Pose.NORTH:

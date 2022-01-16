@@ -19,6 +19,38 @@ public class WaveGeneration : MonoBehaviour
    
     float range = 3.28f;
 
+    // keeps track of the time in a way
+    int spellTimer = 0;
+
+    // the image array
+    public Texture2D[] waveImages;
+
+    // a test image for now, but later we'll be loading up arrays of images (spellcards)
+    public Texture2D testImage;
+
+    // the attack coroutines
+    Coroutine generateTerrain = null;
+
+    IEnumerator GenerateTerrain(Texture2D[] terrainDataImages)
+    {
+        while (true)
+        {
+            if (spellTimer < waveImages.Length)
+            {
+                FromImage(waveImages[spellTimer]);
+                spellTimer += 1;
+            }
+            else
+            {
+                spellTimer = 0;
+                StopGenerating();
+            }
+            Debug.Log(spellTimer);
+            myTerrainData.SetHeights(0, 0, heightArray);
+            yield return new WaitForSeconds(0.04f);
+        }
+    }
+
     void Start () 
 	{
         myTerrainData = gameObject.GetComponent<TerrainCollider>().terrainData;
@@ -33,20 +65,48 @@ public class WaveGeneration : MonoBehaviour
 
         originate = new Vector3(Random.Range(0.0f, 100.0f), 0, Random.Range(0.0f, 100.0f)) ; // start sampling from a random location in the "Sea of PerlinNoise"
 
-        Perlin(originate, resolution, range);
+        //Perlin(originate, resolution, range);
+        FromImage(waveImages[spellTimer]);
 
 		// Assign values from heightArray into the terrain object's heightmap
 		myTerrainData.SetHeights(0, 0, heightArray);
         transform.Translate(-xSize/2, -ySize/2, -zSize/2); //center the Terrain about the origin
-	}
+
+        waveImages = Resources.LoadAll<Texture2D>("data32");
+    }
 
     public void Update()
     {
-        originate.z += deltaZ;
-        Perlin(originate, resolution, range);
-        myTerrainData.SetHeights(0, 0, heightArray);
-    }
+        //originate.z += deltaZ;
 
+        //Perlin(originate, resolution, range);
+        if (spellTimer == 0)
+        {
+            generateTerrain = StartCoroutine(GenerateTerrain(waveImages));
+        }
+    }
+    public bool isGenerating { get { return generateTerrain != null; } }
+    public void StopGenerating()
+    {
+        if (isGenerating)
+        {
+            StopCoroutine(generateTerrain);
+        }
+        generateTerrain = null;
+    }
+    void FromImage(Texture2D image)
+    {
+        for (int i = 0; i < image.width; i++)
+        {
+            for (int j = 0; j < image.height; j++)
+            {
+                Color pixel = image.GetPixel(i, j);
+                float height = (.499f + pixel.grayscale);
+                //Debug.Log(height);
+                heightArray[i, j] = height;
+            }
+        }
+    }
 
     void Perlin(Vector3 originate, int resolution, float range)
     {

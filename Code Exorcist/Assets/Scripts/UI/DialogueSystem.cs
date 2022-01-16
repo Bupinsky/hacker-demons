@@ -140,9 +140,10 @@ public class DialogueSystem : MonoBehaviour
             if (messageText.text.Length > 0
                 && targetSpeech[messageText.text.Length-1] == '!'
                 || targetSpeech[messageText.text.Length-1] == '.'
-                || targetSpeech[messageText.text.Length-1] == '?')
+                || targetSpeech[messageText.text.Length-1] == '?'
+                || targetSpeech[messageText.text.Length-1] == ',')
             {
-                yield return new WaitForSeconds(0.05f);
+                yield return new WaitForSeconds(0.06f);
             }
             yield return new WaitForSeconds(0.02f);
             //yield return new WaitForEndOfFrame();

@@ -17,7 +17,7 @@ public class _Board : MonoBehaviour
     float g = 2f;  //
     Vector3 gravity;
 
-    float thrust = 20f;  //this variable added to give vehicle self-propulsion, must be large enough to overcome gravity
+    float characterSpeed = 50f;
 
     Vector3 origin;
 
@@ -56,7 +56,8 @@ public class _Board : MonoBehaviour
 
         normal = oceanSurface.GetComponent<TerrainCollider>().terrainData.GetInterpolatedNormal((x + 100f) / 200f, (z + 100f) / 200f).normalized;
 
-        transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, normal).normalized, normal);
+        //not needed cuz I want it to start on a flat surface
+        //transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, normal).normalized, normal);
 
         transform.Translate(0, .5f, 0, Space.Self);
 
@@ -77,93 +78,103 @@ public class _Board : MonoBehaviour
 
         acc = Vector3.Dot(transform.forward, gravity) * transform.forward;
         vel = vel + Time.deltaTime * acc;
+        //Surf();
+
+        //make sure the board is facing forward
+        transform.rotation = Quaternion.Euler(transform.rotation.x, 0f, transform.rotation.z);
+
+
+
+        //////////////////////////////////////BASIC MOVEMENT/////////////////////////////////////
+
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S))
+        {
+            if (Input.GetKey(KeyCode.W))
+            {
+                vel.z = characterSpeed;
+            }
+
+            if (Input.GetKey(KeyCode.S))
+            {
+                vel.z = -characterSpeed;
+            }
+        } else
+        {
+            vel.z = 0;
+        }
+
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+        {
+            if (Input.GetKey(KeyCode.A))
+            {
+                vel.x = -characterSpeed;
+            }
+
+            if (Input.GetKey(KeyCode.D))
+            {
+                vel.x = characterSpeed;
+            }
+        }
+        else
+        {
+            vel.x = 0;
+        }
+
+        //////////////////////////////////////////////////////////////////////////////////////////
+
+
         Surf();
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            acc = thrust * transform.forward;
-            vel = vel + Time.deltaTime * acc;
-        }
 
-        if (Input.GetKey(KeyCode.S))
-        {
-            acc = -thrust * vel.normalized;
-            if (vel.magnitude <= thrust * Time.deltaTime)  //to avoid having vehicle move backwards, just stop entirely
-            {
-                acc = Vector3.zero;
-                vel = Vector3.zero;  //but be careful not to set forward vector to zero!
-            }
-            else
-                vel = vel + Time.deltaTime * acc;
-        }
+        vel = vel + Time.deltaTime * acc;
 
-        if (Input.GetKey(KeyCode.A))
-        {
-            speed = vel.magnitude;
-            if (speed >= .02f)
-            {
-                if (normal.x > flatSurfaceValue || normal.z > flatSurfaceValue)
-                {
-                    transform.Rotate(0f, -5f, 0f, Space.Self); //this maintains transform.up, but changes transform.forward and transform.right
-                } else
-                {
-                    transform.Rotate(0f, -0.5f, 0f, Space.Self);
-                }
-                vel = speed * transform.forward;
-            }
 
-        }
 
-        if (Input.GetKey(KeyCode.D))
-        {
-            speed = vel.magnitude;
-            if (speed >= .02f)
-            {
-                if (normal.x > flatSurfaceValue || normal.z > flatSurfaceValue)
-                {
-                    transform.Rotate(0f, 5f, 0f, Space.Self); //this maintains transform.up, but changes transform.forward and transform.right
-                } else
-                {
-                    transform.Rotate(0f, 0.5f, 0f, Space.Self);
-                }
-                vel = speed * transform.forward;
-            }
-
-        }
         if (cooldown > 0)
         {
             cooldown -= Time.deltaTime;
         } else
         {
             cooldown = 0;
-            if (Input.GetKey(KeyCode.UpArrow) && cooldown <= 0)
+
+            if (Input.GetKey(KeyCode.Space) && cooldown <= 0)
             {
                 Shoot("UP");
                 cooldown = 0.4f;
             }
-            if (Input.GetKey(KeyCode.DownArrow) && cooldown <= 0)
-            {
-                Shoot("DOWN");
-                cooldown = 0.4f;
-            }
-            if (Input.GetKey(KeyCode.LeftArrow) && cooldown <= 0)
-            {
-                Shoot("LEFT");
-                cooldown = 0.4f;
-            }
-            if (Input.GetKey(KeyCode.RightArrow) && cooldown <= 0)
-            {
-                Shoot("RIGHT");
-                cooldown = 0.4f;
-            }
+
+
+            // old controls
+            /*            if (Input.GetKey(KeyCode.UpArrow) && cooldown <= 0)
+                        {
+                            Shoot("UP");
+                            cooldown = 0.4f;
+                        }
+                        if (Input.GetKey(KeyCode.DownArrow) && cooldown <= 0)
+                        {
+                            Shoot("DOWN");
+                            cooldown = 0.4f;
+                        }
+                        if (Input.GetKey(KeyCode.LeftArrow) && cooldown <= 0)
+                        {
+                            Shoot("LEFT");
+                            cooldown = 0.4f;
+                        }
+                        if (Input.GetKey(KeyCode.RightArrow) && cooldown <= 0)
+                        {
+                            Shoot("RIGHT");
+                            cooldown = 0.4f;
+                        }*/
         }
 
         x = x + Time.deltaTime * (vel.x+vel.normalized.x);
         z = z + Time.deltaTime * (vel.z+vel.normalized.z); //subtract an ammount proportional to the movement of the waves
-        if (normal.x > flatSurfaceValue || normal.z > flatSurfaceValue)
+
+        // not gonna use this anymore probs
+/*        if (normal.x > flatSurfaceValue || normal.z > flatSurfaceValue)
         {
             z -= ocean.GetComponent<WaveGeneration>().deltaZ * 50;
-        }
+        }*/
 
             y = oceanSurface.SampleHeight(new Vector3(x, 0, z)) + oceanSurface.GetPosition().y;
 
@@ -203,14 +214,27 @@ public class _Board : MonoBehaviour
     {
         gradient = new Vector3(normal.x, 0f, normal.z).normalized;
 
-        if (normal.x > flatSurfaceValue || normal.z > flatSurfaceValue)
+        if (normal.x > flatSurfaceValue || normal.z > flatSurfaceValue || -normal.x > flatSurfaceValue || -normal.z > flatSurfaceValue)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.ProjectOnPlane(Quaternion.Euler(0, 90, 0) * gradient, normal).normalized, normal), 0.1f);
-        }
+            // old surf function
+            //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.ProjectOnPlane(Quaternion.Euler(0, 90, 0) * gradient, normal).normalized, normal), 0.1f);
+            /*vel.x += normal.x * normal.x * normal.x * 200;
+            vel.z += normal.z * normal.z * normal.z * 200;*/
 
-        speed = vel.magnitude;
-        //vel = (speed+(normal.x*normal.x+normal.z*normal.z)*2) * transform.forward;
-        vel = speed * transform.forward;
+            // i think this is the part that determines traction
+            vel.x += normal.x * normal.x * normal.x * 300;
+            vel.z += normal.z * normal.z * normal.z * 300;
+
+            Debug.Log(gradient.x);
+            Debug.Log(normal.y);
+            Debug.Log(gradient.z);
+        }
+        // huh?
+        // speed = vel.magnitude;
+
+
+        // wha?
+        // vel = speed * transform.forward;
     }
 
     void Shoot(string shotDirection)
