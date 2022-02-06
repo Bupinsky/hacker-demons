@@ -25,11 +25,9 @@ public class _Board : MonoBehaviour
 
     public float flatSurfaceValue;
 
-    public GameObject bullet;
+    public GameObject bulletBlueprint;
 
-    public GameObject[] bulletList;
-
-    public int numBullets = 1;
+    public List<GameObject> bullets;  
 
     public GameObject ocean;
 
@@ -60,8 +58,6 @@ public class _Board : MonoBehaviour
         //transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(transform.forward, normal).normalized, normal);
 
         transform.Translate(0, .5f, 0, Space.Self);
-
-        bulletList = new GameObject[numBullets];
        
     }
 
@@ -128,7 +124,14 @@ public class _Board : MonoBehaviour
 
         vel = vel + Time.deltaTime * acc;
 
-
+        for (int i = 0; i < bullets.Count; i++)
+        {
+            if (bullets[i] == null)
+            {
+                bullets.RemoveAt(i);
+                //Debug.Log("List item removed");
+            }
+        }
 
         if (cooldown > 0)
         {
@@ -225,9 +228,9 @@ public class _Board : MonoBehaviour
             vel.x += normal.x * normal.x * normal.x * 1000;
             vel.z += normal.z * normal.z * normal.z * 1000;
 
-            Debug.Log(gradient.x);
-            Debug.Log(normal.y);
-            Debug.Log(gradient.z);
+            //Debug.Log(gradient.x);
+            //Debug.Log(normal.y);
+            //Debug.Log(gradient.z);
         }
         // huh?
         // speed = vel.magnitude;
@@ -241,27 +244,27 @@ public class _Board : MonoBehaviour
     {
         if (shotDirection == "UP")
         {
-            bulletList[0] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
-            bulletList[0].transform.localScale = new Vector3(5, 5, 5);
-            bulletList[0].GetComponent<BulletScript>().SetVelocity(0, 0, 100);
+            bullets.Add(Instantiate(bulletBlueprint, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity));
+            bullets[bullets.Count - 1].transform.localScale = new Vector3(5, 5, 5);
+            bullets[bullets.Count - 1].GetComponent<BulletScript>().SetVelocity(0, 0, 100);
         }
         if (shotDirection == "DOWN")
         {
-            bulletList[0] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
-            bulletList[0].transform.localScale = new Vector3(5, 5, 5);
-            bulletList[0].GetComponent<BulletScript>().SetVelocity(0, 0, -100);
+            bullets.Add(Instantiate(bulletBlueprint, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity));
+            bullets[bullets.Count - 1].transform.localScale = new Vector3(5, 5, 5);
+            bullets[bullets.Count - 1].GetComponent<BulletScript>().SetVelocity(0, 0, -100);
         }
         if (shotDirection == "LEFT")
         {
-            bulletList[0] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
-            bulletList[0].transform.localScale = new Vector3(5, 5, 5);
-            bulletList[0].GetComponent<BulletScript>().SetVelocity(-100, 0, 0);
+            bullets.Add(Instantiate(bulletBlueprint, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity));
+            bullets[bullets.Count - 1].transform.localScale = new Vector3(5, 5, 5);
+            bullets[bullets.Count - 1].GetComponent<BulletScript>().SetVelocity(-100, 0, 0);
         }
         if (shotDirection == "RIGHT")
         {
-            bulletList[0] = Instantiate(bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
-            bulletList[0].transform.localScale = new Vector3(5, 5, 5);
-            bulletList[0].GetComponent<BulletScript>().SetVelocity(100, 0, 0);
+            bullets.Add(Instantiate(bulletBlueprint, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity));
+            bullets[bullets.Count - 1].transform.localScale = new Vector3(5, 5, 5);
+            bullets[bullets.Count - 1].GetComponent<BulletScript>().SetVelocity(100, 0, 0);
         }
     }
 

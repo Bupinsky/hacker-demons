@@ -45,7 +45,7 @@ public class WaveGeneration : MonoBehaviour
                 spellTimer = 0;
                 StopGenerating();
             }
-            Debug.Log(spellTimer);
+            //Debug.Log(spellTimer);
             myTerrainData.SetHeights(0, 0, heightArray);
             yield return new WaitForSeconds(0.04f);
         }
