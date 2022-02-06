@@ -72,7 +72,7 @@ public class WaveGeneration : MonoBehaviour
 		myTerrainData.SetHeights(0, 0, heightArray);
         transform.Translate(-xSize/2, -ySize/2, -zSize/2); //center the Terrain about the origin
 
-        waveImages = Resources.LoadAll<Texture2D>("data32");
+        //waveImages = Resources.LoadAll<Texture2D>("data32");
     }
 
     public void Update()
@@ -96,11 +96,11 @@ public class WaveGeneration : MonoBehaviour
     }
     void FromImage(Texture2D image)
     {
-        for (int i = 0; i < image.width; i++)
+        for (int i = 1; i <= image.width; i++)
         {
-            for (int j = 0; j < image.height; j++)
+            for (int j = 1; j <= image.height; j++)
             {
-                Color pixel = image.GetPixel(i, j);
+                Color pixel = image.GetPixel(i-1, j-1);
                 float height = (.499f + pixel.grayscale);
                 //Debug.Log(height);
                 heightArray[i, j] = height;

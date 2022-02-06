@@ -222,8 +222,8 @@ public class _Board : MonoBehaviour
             vel.z += normal.z * normal.z * normal.z * 200;*/
 
             // i think this is the part that determines traction
-            vel.x += normal.x * normal.x * normal.x * 300;
-            vel.z += normal.z * normal.z * normal.z * 300;
+            vel.x += normal.x * normal.x * normal.x * 1000;
+            vel.z += normal.z * normal.z * normal.z * 1000;
 
             Debug.Log(gradient.x);
             Debug.Log(normal.y);
